@@ -1,4 +1,4 @@
-package com.example.doan.ui
+package com.example.appdoanltdd.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,7 +60,7 @@ fun reiseger(navController: NavController) {
     var pass by remember { mutableStateOf("") }
     var cpass by remember { mutableStateOf("") }
     var showPass by remember { mutableStateOf(false) }
-    var email by remember { mutableStateOf("") }
+    var emails by remember { mutableStateOf("") }
     val viewModel: AuthViewModel = viewModel()
     val authState by viewModel.authState.collectAsState()
 
@@ -96,8 +96,8 @@ fun reiseger(navController: NavController) {
 
             Spacer(modifier = Modifier.height(230.dp)) // Thêm khoảng cách nếu cần
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = emails,
+                onValueChange = { emails = it },
                 placeholder = { Text("Email") },
                 leadingIcon = { Icon(Icons.Default.AssignmentInd, contentDescription = null) },
                 shape = RoundedCornerShape(24.dp),
@@ -204,7 +204,7 @@ fun reiseger(navController: NavController) {
                     // show error
                     return@Button
                 }
-                    viewModel.register(user, pass)},
+                    viewModel.register(user, emails,cpass)},
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
                     .padding(top = 20.dp, bottom = 20.dp),
                 shape = RoundedCornerShape(16.dp),

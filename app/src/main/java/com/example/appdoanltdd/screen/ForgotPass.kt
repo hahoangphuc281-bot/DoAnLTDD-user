@@ -4,21 +4,41 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AssignmentInd
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,71 +49,68 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appdoanltdd.R
-import com.example.appdoanltdd.viewmodel.AuthState
 import com.example.appdoanltdd.viewmodel.AuthViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.StateFlow
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-
+import androidx.compose.ui.platform.LocalContext
+import com.example.appdoanltdd.viewmodel.AuthState
 @ExperimentalMaterial3Api
 @Composable
-fun loginscreen(navController: NavController){
+fun forgotpass(navController: NavController){
 
-    var user by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
-
+    var cpass by remember { mutableStateOf("") }
     var showPass by remember { mutableStateOf(false) }
+    var email by remember { mutableStateOf("") }
     val authViewModel: AuthViewModel = viewModel()
-
-
     val authState by authViewModel.authState.collectAsState()
-
     val context = LocalContext.current
-
-    // Xử lý state
-    LaunchedEffect(authState) {
-        when (authState) {
-            is AuthState.Success -> {
-                val successState = authState as AuthState.Success
-                Toast.makeText(context, successState.message, Toast.LENGTH_SHORT).show()
-                // Lưu token nếu cần
-                // SharedPreferences hoặc DataStore
-                // Chuyển màn hình
-                navController.navigate("Pro") {
-                    popUpTo("login") { inclusive = true }
-                }
-                authViewModel.resetState()
-            }
-            is AuthState.Error -> {
-                val errorState = authState as AuthState.Error
-                Toast.makeText(context, errorState.message, Toast.LENGTH_LONG).show()
-                authViewModel.resetState()
-            }
-            else -> {}
+    var oldPass by remember { mutableStateOf("") }      // mật khẩu hiện tại
+    var newPass by remember { mutableStateOf("") }      // mật khẩu mới
+    var confirmPass by remember { mutableStateOf("") }  // xác nhận mật khẩu mới
+    when (authState) {
+        is AuthState.Loading -> {
+            // nếu muốn hiện loading thì làm ở đây
         }
+
+        is AuthState.Success -> {
+            Toast.makeText(
+                context,
+                (authState as AuthState.Success).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            authViewModel.resetState()
+
+            navController.navigate("Login") {
+                popUpTo("forgotpass") { inclusive = true }
+            }
+        }
+
+        is AuthState.Error -> {
+            Toast.makeText(
+                context,
+                (authState as AuthState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            authViewModel.resetState()
+        }
+
+        else -> {}
     }
 
 
 
 
 
-    Box(modifier = Modifier.fillMaxSize().fillMaxWidth().background(Color(0xFFC2D2D1))){
+    Box(modifier = Modifier.fillMaxSize().fillMaxWidth().background(Color(0xFFC2D2D1))) {
         Box(
             modifier = Modifier
 
                 .fillMaxWidth()
-                .height(500.dp)
-            ,
+                .height(500.dp),
             contentAlignment = Alignment.Center
         ) {
-
 
 
             // 🧴 ẢNH CHAI — NGUYÊN Y CHỈNH CỦA BẠN
@@ -107,15 +124,18 @@ fun loginscreen(navController: NavController){
                 contentScale = ContentScale.Fit
             )
         }
-        Column(modifier = Modifier.fillMaxWidth().fillMaxSize().padding(horizontal = 32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(
+            modifier = Modifier.fillMaxWidth().fillMaxSize().padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
 
-
-
+            Spacer(modifier = Modifier.height(150.dp)) // Thêm khoảng cách nếu cần
             OutlinedTextField(
-                value = user,
-                onValueChange = { user = it },
-                placeholder = { Text("Username") },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+                value = email,
+                onValueChange = { email = it },
+                placeholder = { Text("Email") },
+                leadingIcon = { Icon(Icons.Default.AssignmentInd, contentDescription = null) },
                 shape = RoundedCornerShape(24.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,14 +148,15 @@ fun loginscreen(navController: NavController){
                     focusedBorderColor = Color.Transparent
                 )
             )
-
-            Spacer(modifier = Modifier.height(16.dp)) // Thêm khoảng cách nếu cần
+            // Thêm khoảng cách nếu cần
 
 // Password
+            Spacer(modifier = Modifier.height(30.dp))
+             // Thêm khoảng cách nếu cần
             OutlinedTextField(
-                value = pass,
-                onValueChange = { pass = it },
-                placeholder = { Text("Password") },
+                value = newPass,
+                onValueChange = { newPass = it },
+                placeholder = { Text(" Comfrim Password") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     IconButton(onClick = { showPass = !showPass }) {
@@ -158,19 +179,25 @@ fun loginscreen(navController: NavController){
                     focusedBorderColor = Color.Transparent
                 )
             )
-            Text("Forgot password ?", textAlign = TextAlign.Center,fontSize = 15.sp, modifier = Modifier.fillMaxWidth().padding(start =200.dp,top =20.dp).clickable {
-                navController.navigate("Pass")
-            }, color = Color(0xFF8A5252))
+            Spacer(modifier = Modifier.height(42.dp))
+
             Button(
-                onClick = {if (user.isNotBlank() && pass.isNotBlank()) {
-                    authViewModel.login(user, pass)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Vui lòng nhập đầy đủ thông tin",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }},
+                onClick = {
+
+                    if (email.isBlank() || newPass.isBlank()) {
+                        Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+
+
+
+                    authViewModel.changePassword(
+                        email = email,
+
+                        newPass = newPass
+                    )
+
+                },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
                     .padding(top = 20.dp, bottom = 20.dp),
                 shape = RoundedCornerShape(16.dp),
@@ -180,19 +207,23 @@ fun loginscreen(navController: NavController){
                 ),
                 elevation = ButtonDefaults.buttonElevation(0.dp)
             ) {
-                Text("Login", fontSize = 20.sp)
+                Text("Confirm", fontSize = 20.sp)
             }
+            Text(
+                "Cancel",
+                textAlign = TextAlign.Center,
+                fontSize = 15.sp,
+                modifier = Modifier.clickable {
+                    navController.navigate("Login")
+                },
+                color = Color(0xFF8A5252),
+                fontWeight = FontWeight.Bold
+            )
 
-            Row(modifier = Modifier.fillMaxWidth().padding(start = 100.dp)) {
-                Text("No account yet?", textAlign = TextAlign.Center,fontSize = 15.sp,color = Color(0xFF8A5252))
-                Text("Register", textAlign = TextAlign.Center,fontSize = 15.sp, modifier = Modifier.clickable {
-                    navController.navigate("resei")
-                }, color = Color(0xFF8A5252), fontWeight = FontWeight.Bold)
 
-            }
+
+
 
         }
-
     }
-
 }

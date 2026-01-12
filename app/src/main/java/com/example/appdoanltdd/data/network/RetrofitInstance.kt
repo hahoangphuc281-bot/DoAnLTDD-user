@@ -1,5 +1,6 @@
-package com.example.doan.data.api
+package com.example.appdoanltdd.data.network
 
+import com.example.appdoanltdd.data.network.ApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

@@ -6,6 +6,7 @@ import com.example.appdoanltdd.data.model.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.appdoanltdd.data.model.ChangePasswordRequest
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -63,11 +64,14 @@ class AuthViewModel(
     fun resetState() {
         _authState.value = AuthState.Idle
     }
-    fun register(username: String, password: String) {
+    // Trong file AuthViewModel.kt
+    fun register(username: String, email: String, password: String) { // Thêm email vào tham số
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             try {
-                val response = repository.register(username, password)
+                // Truyền thêm email vào hàm repository.register
+                val response = repository.register(username, email, password)
+
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
                     if (body.succeeded) {
@@ -83,5 +87,27 @@ class AuthViewModel(
             }
         }
     }
+    fun changePassword(email: String, newPass: String) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            try {
+                val res = repository.changePassword(
+                    ChangePasswordRequest(email, newPass)
+                )
+
+                if (res.isSuccessful && res.body()?.succeeded == true) {
+                    _authState.value = AuthState.Success(res.body()!!.message, null)
+                } else {
+                    _authState.value = AuthState.Error(
+                        res.body()?.message ?: "Đổi mật khẩu thất bại"
+                    )
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error(e.message ?: "Lỗi")
+            }
+        }
+    }
+
+
 
 }
